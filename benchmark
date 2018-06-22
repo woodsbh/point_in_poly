@@ -22,23 +22,18 @@ def generate_random_lat_longs(number, polygon):
 region_json_file = '/Users/bwoods/Downloads/hkpolygon.json'
 
 p = pointinpolygon.PointInPolygon()
+print 'making test shape'
 polygons = p.make_polygons_geojson(region_json_file,subdivide=False)[0]
 polygon = cascaded_union([x for x in polygons])
-p.make_polygons_geojson(region_json_file, subdivide=True)
+print 'making fishnet shapes. This may take a bit depending on how small the dividison threshold is...'
+p.make_polygons_geojson(region_json_file, subdivide=True, division_threshold=.001)
 p.make_datafame()
+
 
 print 'Making random Points'
 lat_longs = generate_random_lat_longs(100000, polygon)
 
-idx = p.make_tree()
-#
-# print 'running test'
-# st = datetime.datetime.now()
-# for xy in lat_longs:
-#     region = p.point_in_poly_gdf(xy[0], xy[1])
-# print datetime.datetime.now() - st
-
-print 'running spatial join'
+print 'running spatial join test'
 st = datetime.datetime.now()
 points = p.add_points(lat_longs)
 p.make_datafame('point')
@@ -46,10 +41,10 @@ result = p.spatial_join()
 print datetime.datetime.now() - st
 
 p.make_tree()
-print 'running test'
+print 'running lat_long loop test'
 st = datetime.datetime.now()
 for xy in lat_longs:
-     p.point_on_polys_rtree(xy[0], xy[1])
+    p.point_on_polys_rtree(xy[0], xy[1])
 print datetime.datetime.now() - st
 
 # p.make_shapely_index()
@@ -57,4 +52,12 @@ print datetime.datetime.now() - st
 # st = datetime.datetime.now()
 # for xy in lat_longs:
 #      p.point_on_polys_shapely(xy[0], xy[1])
+# print datetime.datetime.now() - st
+
+
+#
+# print 'running test'
+# st = datetime.datetime.now()
+# for xy in lat_longs:
+#     region = p.point_in_poly_gdf(xy[0], xy[1])
 # print datetime.datetime.now() - st

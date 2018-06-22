@@ -4,6 +4,7 @@ import json
 from shapely.geometry import shape, Point, box
 import shapely.speedups
 from shapely.strtree import STRtree
+import numpy
 
 class PointInPolygon:
     def __init__(self, polygons=None, data=None):
@@ -22,19 +23,14 @@ class PointInPolygon:
 
     def make_datafame(self, type='polygon', data=None, crs={'init' :'epsg:4326'}):
         if type.lower() in ['polygon','polygons']:
-            data = self.data
-            if self.data:
-                gdf = geopandas.GeoDataFrame(geometry=self.polygons, data=self.data)
+            if self.data.size >0:
+                gdf = geopandas.GeoDataFrame(geometry=self.polygons, data=self.data.tolist())
             else:
                 gdf = geopandas.GeoDataFrame(geometry=self.polygons)
             self.polygon_sindex = gdf.sindex
             self.poly_df = gdf
         elif type.lower()in ['point','points']:
-            if data:
-                gdf = geopandas.GeoDataFrame(geometry=self.points, data=self.data)
-            else:
-                gdf = geopandas.GeoDataFrame(geometry=self.points)
-
+            gdf = geopandas.GeoDataFrame(geometry=self.points)
             self.point_sindex = gdf.sindex
             self.point_df = gdf
         gdf.crs = crs
@@ -48,9 +44,9 @@ class PointInPolygon:
             self.original_polygons.append(polygon)
             if polygon.is_valid:
                 if subdivide:
-                    polygon = self._divide_polygons(polygon, division_threshold)
-                    for n, x in enumerate(polygon):
-                        name = '{}_{}'.format(feature['properties'][id_column], n)
+                    divided_polygons = self._divide_polygons(polygon, division_threshold)
+                    for n, x in enumerate(divided_polygons):
+                        name = '{}'.format(feature['properties'][id_column])
                         polygons.append([name, x])
                 else:
                     self.poly_subdivide = False
@@ -58,8 +54,8 @@ class PointInPolygon:
                     polygons.append([name,polygon])
             else:
                 print 'invalid poly {}'.format(feature)
-        self.polygons = [x[1] for x in polygons]
-        self.data = [x[0] for x in polygons]
+        self.polygons = numpy.array([x[1] for x in polygons])
+        self.data = numpy.array([x[0] for x in polygons])
         return self.polygons, self.data
 
     def add_points(self, latlongs):
@@ -116,7 +112,7 @@ class PointInPolygon:
         self.rindex = idx
         return idx
 
-    def point_on_polys_rtree(self, x, y):
+    def point_on_polys_rtree(self,x,y):
         for idx in self.rindex.intersection((x, y)):
             if Point(x,y).within(self.polygons[idx]):
                 return self.data[idx]
@@ -129,8 +125,6 @@ class PointInPolygon:
                 for x, p in enumerate(self.original_polygons):
                     if p.intersects(poly):
                         return self.data[x]
-                else:
-                    return None
 
     def make_shapely_index(self):
         shapely_index = STRtree(self.polygons)
