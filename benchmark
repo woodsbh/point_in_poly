@@ -38,14 +38,25 @@ st = datetime.datetime.now()
 points = p.add_points(lat_longs)
 p.make_datafame('point')
 result = p.spatial_join()
-print datetime.datetime.now() - st
+print (datetime.datetime.now() - st).total_seconds()
 
 p.make_tree()
 print 'running lat_long loop test'
 st = datetime.datetime.now()
 for xy in lat_longs:
     p.point_on_polys_rtree(xy[0], xy[1])
-print datetime.datetime.now() - st
+print (datetime.datetime.now() - st).total_seconds()
+
+
+print 'running multiple tests'
+time = list()
+for blah in range(1,10):
+    st = datetime.datetime.now()
+    for xy in lat_longs:
+        p.point_on_polys_rtree(xy[0], xy[1])
+    time.append((datetime.datetime.now() - st).total_seconds())
+    lat_longs = generate_random_lat_longs(100000, polygon)
+print sum(time)/len(time)
 
 # p.make_shapely_index()
 # print 'running test'
