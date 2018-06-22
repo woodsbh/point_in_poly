@@ -22,8 +22,8 @@ class PointInPolygon:
 
     def make_datafame(self, type='polygon', data=None, crs={'init' :'epsg:4326'}):
         if type.lower() in ['polygon','polygons']:
-            if self.data.size >0:
-                gdf = geopandas.GeoDataFrame(geometry=self.polygons, data=self.data.tolist())
+            if self.data:
+                gdf = geopandas.GeoDataFrame(geometry=self.polygons, data=self.data)
             else:
                 gdf = geopandas.GeoDataFrame(geometry=self.polygons)
             self.polygon_sindex = gdf.sindex
@@ -53,8 +53,8 @@ class PointInPolygon:
                     polygons.append([name,polygon])
             else:
                 print 'invalid poly {}'.format(feature)
-        self.polygons = numpy.array([x[1] for x in polygons])
-        self.data = numpy.array([x[0] for x in polygons])
+        self.polygons = [x[1] for x in polygons]
+        self.data = [x[0] for x in polygons]
         return self.polygons, self.data
 
     def add_points(self, latlongs):

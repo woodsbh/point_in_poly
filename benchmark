@@ -33,12 +33,12 @@ p.make_datafame()
 print 'Making random Points'
 lat_longs = generate_random_lat_longs(100000, polygon)
 
-# print 'running spatial join test'
-# st = datetime.datetime.now()
-# points = p.add_points(lat_longs)
-# p.make_datafame('point')
-# result = p.spatial_join()
-# print datetime.datetime.now() - st
+print 'running spatial join test'
+st = datetime.datetime.now()
+points = p.add_points(lat_longs)
+p.make_datafame('point')
+result = p.spatial_join()
+print datetime.datetime.now() - st
 
 p.make_tree()
 print 'running lat_long loop test'
