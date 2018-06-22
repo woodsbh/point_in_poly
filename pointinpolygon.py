@@ -20,16 +20,16 @@ class PointInPolygon:
         self.rindex = None
         self.shapely_index = None
 
-    def make_datafame(self, type='polygon', espg=4326):
+    def make_datafame(self, dftype='polygon', espg=4326):
         crs = {'init' :'epsg:{}'.format(espg)}
-        if type.lower() in ['polygon','polygons']:
+        if dftype.lower() in ['polygon','polygons']:
             if self.data:
                 gdf = geopandas.GeoDataFrame(geometry=self.polygons, data=self.data)
             else:
                 gdf = geopandas.GeoDataFrame(geometry=self.polygons)
             self.polygon_sindex = gdf.sindex
             self.poly_df = gdf
-        elif type.lower()in ['point','points']:
+        elif dftype.lower()in ['point','points']:
             gdf = geopandas.GeoDataFrame(geometry=self.points)
             self.point_sindex = gdf.sindex
             self.point_df = gdf
