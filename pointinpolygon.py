@@ -129,6 +129,8 @@ class PointInPolygon:
                 for x, p in enumerate(self.original_polygons):
                     if p.intersects(poly):
                         return self.data[x]
+                else:
+                    return None
 
     def make_shapely_index(self):
         shapely_index = STRtree(self.polygons)
