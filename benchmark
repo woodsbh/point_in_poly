@@ -26,19 +26,19 @@ print 'making test shape'
 polygons = p.make_polygons_geojson(region_json_file,subdivide=False)[0]
 polygon = cascaded_union([x for x in polygons])
 print 'making fishnet shapes. This may take a bit depending on how small the dividison threshold is...'
-p.make_polygons_geojson(region_json_file, subdivide=True, division_threshold=.001)
+p.make_polygons_geojson(region_json_file, subdivide=True, division_threshold=.005)
 p.make_datafame()
 
 
 print 'Making random Points'
 lat_longs = generate_random_lat_longs(100000, polygon)
 
-print 'running spatial join test'
-st = datetime.datetime.now()
-points = p.add_points(lat_longs)
-p.make_datafame('point')
-result = p.spatial_join()
-print datetime.datetime.now() - st
+# print 'running spatial join test'
+# st = datetime.datetime.now()
+# points = p.add_points(lat_longs)
+# p.make_datafame('point')
+# result = p.spatial_join()
+# print datetime.datetime.now() - st
 
 p.make_tree()
 print 'running lat_long loop test'

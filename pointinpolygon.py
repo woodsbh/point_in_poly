@@ -1,4 +1,3 @@
-
 import geopandas
 import json
 from shapely.geometry import shape, Point, box
