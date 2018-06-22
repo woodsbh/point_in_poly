@@ -2,8 +2,7 @@ import pointinpolygon
 import random
 from shapely.ops import cascaded_union
 import datetime
-import pandas
-from shapely.geometry import Point
+
 
 def generate_random_lat_longs(number, polygon):
     """grabbed off stack exchange"""
@@ -16,7 +15,6 @@ def generate_random_lat_longs(number, polygon):
         list_of_latlongs.append(pt)
         counter += 1
     return list_of_latlongs
-
 
 
 region_json_file = '/Users/bwoods/Downloads/hkpolygon.json'

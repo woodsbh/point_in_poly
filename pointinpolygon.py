@@ -112,8 +112,9 @@ class PointInPolygon:
         return idx
 
     def point_on_polys_rtree(self,x,y):
+        pt = Point(x, y)
         for idx in self.rindex.intersection((x, y)):
-            if Point(x,y).within(self.polygons[idx]):
+            if pt.within(self.polygons[idx]):
                 return self.data[idx]
 
     def point_on_polys_shapely(self, x, y):
