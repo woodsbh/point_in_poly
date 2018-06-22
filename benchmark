@@ -30,11 +30,13 @@ p.make_datafame()
 print 'Making random Points'
 lat_longs = generate_random_lat_longs(100000, polygon)
 
-print 'running test'
-st = datetime.datetime.now()
-for xy in lat_longs:
-    region = p.point_in_poly_gdf(xy[0], xy[1])
-print datetime.datetime.now() - st
+idx = p.make_tree()
+#
+# print 'running test'
+# st = datetime.datetime.now()
+# for xy in lat_longs:
+#     region = p.point_in_poly_gdf(xy[0], xy[1])
+# print datetime.datetime.now() - st
 
 print 'running spatial join'
 st = datetime.datetime.now()
@@ -43,7 +45,16 @@ p.make_datafame('point')
 result = p.spatial_join()
 print datetime.datetime.now() - st
 
+p.make_tree()
+print 'running test'
+st = datetime.datetime.now()
+for xy in lat_longs:
+     p.point_on_polys_rtree(xy[0], xy[1])
+print datetime.datetime.now() - st
+
+# p.make_shapely_index()
+# print 'running test'
 # st = datetime.datetime.now()
 # for xy in lat_longs:
-#      p.point_on_polys(xy[0], xy[1])
+#      p.point_on_polys_shapely(xy[0], xy[1])
 # print datetime.datetime.now() - st

@@ -17,6 +17,8 @@ class PointInPolygon:
         self.point_sindex = None
         self.point_df = None
         self.poly_subdivide = True
+        self.rindex = None
+        self.shapely_index = None
 
     def make_datafame(self, type='polygon', data=None, crs={'init' :'epsg:4326'}):
         if type.lower() in ['polygon','polygons']:
@@ -104,16 +106,33 @@ class PointInPolygon:
             p = None
         return p
 
-    def point_on_polys(self,x,y):
-        pt = Point(x,y)
-        rinxex = STRtree(self.polygons)
-        result = rinxex.query(pt)
+    def make_tree(self):
+        from rtree import index
+        idx = index.Index()
+        count = -1
+        for q in self.polygons:
+            count += 1
+            idx.insert(count, (q.bounds))
+        self.rindex = idx
+        return idx
+
+    def point_on_polys_rtree(self, x, y):
+        for idx in self.rindex.intersection((x, y)):
+            if Point(x,y).within(self.polygons[idx]):
+                return self.data[idx]
+
+    def point_on_polys_shapely(self, x, y):
+        pt = Point(x, y)
+        result = self.shapely_index.query(pt)
         for x, poly in enumerate(result):
             if pt.within(poly):
-                for x,p in enumerate(self.original_polygons):
+                for x, p in enumerate(self.original_polygons):
                     if p.intersects(poly):
                         return self.data[x]
 
+    def make_shapely_index(self):
+        shapely_index = STRtree(self.polygons)
+        self.shapely_index = shapely_index
 
     def spatial_join(self):
         return geopandas.sjoin(self.point_df, self.poly_df, how='inner', op='within')
