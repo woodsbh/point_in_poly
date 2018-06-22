@@ -1,0 +1,49 @@
+import pointinpolygon
+import random
+from shapely.ops import cascaded_union
+import datetime
+import pandas
+from shapely.geometry import Point
+
+def generate_random_lat_longs(number, polygon):
+    """grabbed off stack exchange"""
+    list_of_latlongs = []
+    minx, miny, maxx, maxy = polygon.bounds
+    counter = 0
+    while counter < number:
+        pt = [random.uniform(minx, maxx), random.uniform(miny, maxy)]
+        #if polygon.contains(Point(pt)):
+        list_of_latlongs.append(pt)
+        counter += 1
+    return list_of_latlongs
+
+
+
+region_json_file = '/Users/bwoods/Downloads/hkpolygon.json'
+
+p = pointinpolygon.PointInPolygon()
+polygons = p.make_polygons_geojson(region_json_file,subdivide=False)[0]
+polygon = cascaded_union([x for x in polygons])
+p.make_polygons_geojson(region_json_file, subdivide=True)
+p.make_datafame()
+
+print 'Making random Points'
+lat_longs = generate_random_lat_longs(100000, polygon)
+
+print 'running test'
+st = datetime.datetime.now()
+for xy in lat_longs:
+    region = p.point_in_poly_gdf(xy[0], xy[1])
+print datetime.datetime.now() - st
+
+print 'running spatial join'
+st = datetime.datetime.now()
+points = p.add_points(lat_longs)
+p.make_datafame('point')
+result = p.spatial_join()
+print datetime.datetime.now() - st
+
+# st = datetime.datetime.now()
+# for xy in lat_longs:
+#      p.point_on_polys(xy[0], xy[1])
+# print datetime.datetime.now() - st
